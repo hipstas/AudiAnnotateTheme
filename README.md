@@ -12,13 +12,13 @@ TODO: Delete this and the text above, and describe your gem
 Add this line to your Jekyll site's `Gemfile`:
 
 ```ruby
-gem "TestTheme2"
+gem "AudiAnnotateTheme"
 ```
 
 And add this line to your Jekyll site's `_config.yml`:
 
 ```yaml
-theme: TestTheme2
+theme: AudiAnnotateTheme
 ```
 
 And then execute:
@@ -27,7 +27,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install TestTheme2
+    $ gem install AudiAnnotateTheme
 
 ## Usage
 
