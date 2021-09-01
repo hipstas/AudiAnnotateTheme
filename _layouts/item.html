@@ -2,7 +2,7 @@
 layout: page
 ---
 
- {%- assign format = site.data[page.manifest_name].manifest.items[0].items[0].items[0].body.type -%}
+{%- assign format = site.data[page.manifest_name].manifest.items[0].items[0].items[0].body.type -%}
 {{ content }}
 
 
@@ -36,7 +36,6 @@ layout: page
 <script src="{{ site.baseurl }}/assets/datatables/datatables.min.js"></script>
 <script src="{{ site.baseurl }}/assets/uv/uv.js"></script>
 
-
 <table id="annotation-table"  class="table table-bordered table-dark">
   <thead>
     <tr>
@@ -47,11 +46,27 @@ layout: page
   </thead>
   <tbody>
     {%- for annotation_page in site.data[page.manifest_name].manifest.items[0].annotations -%}
-      {% assign portions = annotation_page.id | split: '/' %}
-      {% assign real_slug = portions[7] | replace: ".json", "" %}
+      {%- if annotation_page.label.first -%}
+        {% assign page_label = annotation_page.label.first[1] %}
+      {% else %}
+        {% assign page_label = annotation_page.label %}
+      {% endif %}
+
+      {%- if annotation_page.id contains site.github_username -%}
+        {% assign portions = annotation_page.id | split: '/' %}
+        {% assign real_slug = portions[7] | replace: ".json", "" %}
+      {%- else -%}
+        {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_" %}
+      {%- endif -%}
+
       {%- for annotation in site.data[page.manifest_name].canvas-1[real_slug].items -%}
         <tr>
-          {% assign timestamp_array = annotation.target.selector.t | split: ',' %}
+          {% if annotation.target.selector %}
+            {% assign timestamp_array = annotation.target.selector.t | split: ',' %}
+          {% else %}
+            {% assign target_array = annotation.target | split: 't=' %}
+            {% assign timestamp_array = target_array[1] | split: ',' %}
+          {% endif %}
           <td class="timestamp" data-timestamp="{{timestamp_array[0]}}"  data-sort="{{timestamp_array[0]}}">
            {% assign seconds = timestamp_array[0] | times: 1 %}
             {% if seconds >= 3600 %}
@@ -70,7 +85,7 @@ layout: page
             {% endif %}
           </td>
           <td>{{annotation.body.value}}</td>
-          <td>{{annotation_page.label}}</td>
+          <td>{{page_label}}</td>
         </tr>
       {%- endfor -%}
     {%- endfor -%}
@@ -78,7 +93,12 @@ layout: page
 </table>
 
 <div>
-<p></p><p><a href="{{ site.data[page.manifest_name].manifest.homepage[0].id }}">{{ site.data[page.manifest_name].manifest.homepage[0].label.en[0] }}</a> at <a href="{{ site.data[page.manifest_name].manifest.provider[0].id }}">{{ site.data[page.manifest_name].manifest.provider[0].label.en[0] }}</a>. </p>
+<p></p>
+<p>
+  <a href="{{ site.data[page.manifest_name].manifest.homepage[0].id }}">{{ site.data[page.manifest_name].manifest.homepage[0].label.en[0] }}</a>
+   at 
+  <a href="{{ site.data[page.manifest_name].manifest.provider[0].id }}">{{ site.data[page.manifest_name].manifest.provider[0].label.en[0] }}</a>. 
+</p>
 IIIF manifest: <a href="{{site.data[page.manifest_name].manifest.id}}">{{site.data[page.manifest_name].manifest.id}}</a>
 </div>
 
