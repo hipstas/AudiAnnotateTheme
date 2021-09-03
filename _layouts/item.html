@@ -84,7 +84,18 @@ layout: page
                 {% endif %}
             {% endif %}
           </td>
-          <td>{{annotation.body.value}}</td>
+          <td>
+            {%- if annotation.body['type'] -%}
+              {% assign body = annotation.body.value %}
+            {% else %}
+              {% assign body = "" %}
+              {%- for raw_body in annotation.body -%}
+                {% assign body = body | append: raw_body.value %}
+              {% endfor %}
+            {% endif %}
+
+            {{body}}
+          </td>
           <td>{{page_label}}</td>
         </tr>
       {%- endfor -%}
@@ -114,10 +125,9 @@ IIIF manifest: <a href="{{site.data[page.manifest_name].manifest.id}}">{{site.da
 
 $(document).ready( function() {
     $('#annotation-table').DataTable(
-	{ paging: false }
+  { paging: false }
 );
 } );
  </script>
-
 
 
