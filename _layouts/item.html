@@ -90,11 +90,11 @@ layout: page
             {% else %}
               {% assign body = "" %}
               {%- for raw_body in annotation.body -%}
-                {% assign body = body | append: raw_body.value %}
+                {% assign body = body | append: raw_body.value | append: "<br/>" %}
               {% endfor %}
             {% endif %}
 
-            {{body}}
+            {{body | newline_to_br}}
           </td>
           <td>{{page_label}}</td>
         </tr>
