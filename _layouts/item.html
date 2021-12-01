@@ -10,31 +10,40 @@ layout: page
   The media file is not available
 
 {% else %}
-  <div id="uv" {%- if format == "Audio" or format == "Sound" -%} class="uv-audio sticky" {%- else -%} class="uv-video sticky" {%- endif -%}  ></div>
+  <div id="uv" {%- if format == "Audio" or format == "Sound" -%} class="uv uv-audio sticky" {%- else -%} class="uv uv-video sticky" {%- endif -%}  ></div>
 {% endif %}
-
-<script>
-
+  <script
+    type="application/javascript"
+    src="https://cdn.jsdelivr.net/npm/universalviewer@next/dist/umd/UV.js"
+  ></script>
+  <script src="{{ site.baseurl }}/assets/datatables/datatables.min.js"></script>
+  <script>
     var myUV;
 
-    window.addEventListener('uvLoaded', function (e) {
+    myUV = UV.init('uv', {
+        manifestUri: '{{site.data[page.manifest_name].manifest.id}}',
+        manifest: '{{site.data[page.manifest_name].manifest.id}}',
+        root: '../../{{ site.baseurl }}/assets/uv/umd'
+    });
 
-        myUV = createUV('#uv', {
-            iiifResourceUri: '{{site.data[page.manifest_name].manifest.id}}',
-            configUri: '{{ site.baseurl }}/assets/uv-config.json',
-            root: '../../{{ site.baseurl }}/assets/uv'
-        }, new UV.URLDataProvider());
 
-        myUV.on("created", function(obj) {
-            console.log('parsed metadata', myUV.extension.helper.manifest.getMetadata());
-            console.log('raw jsonld', myUV.extension.helper.manifest.__jsonld);
+
+      // override config using an inline json object
+      myUV.on("configure", function ({ config, cb }) {
+        cb({
+            "options": {
+              "dropEnabled": true,
+              "footerPanelEnabled": false,
+              "headerPanelEnabled": false,
+              "leftPanelEnabled": false,
+              "limitLocales": false,
+              "overrideFullScreen": false,
+              "pagingEnabled": false,
+              "rightPanelEnabled": false
+             }
         });
-
-    }, false);
-
+      });
 </script>
-<script src="{{ site.baseurl }}/assets/datatables/datatables.min.js"></script>
-<script src="{{ site.baseurl }}/assets/uv/uv.js"></script>
 
 <table id="annotation-table"  class="table table-bordered table-dark">
   <thead>
@@ -67,7 +76,14 @@ layout: page
             {% assign target_array = annotation.target | split: 't=' %}
             {% assign timestamp_array = target_array[1] | split: ',' %}
           {% endif %}
-          <td class="timestamp" data-timestamp="{{timestamp_array[0]}}"  data-sort="{{timestamp_array[0]}}">
+          <td class="timestamp" 
+              data-timestamp="{{timestamp_array[0]}}"  
+              data-sort="{{timestamp_array[0]}}" 
+              data-target="{{annotation.target.source}}"
+              {% if timestamp_array[1] %}
+                data-endtime="{{timestamp_array[1]}}"  
+              {% endif %}
+          >
            {% assign seconds = timestamp_array[0] | times: 1 %}
             {% if seconds >= 3600 %}
               {{ seconds | divided_by: 3600 | floor }}:{{seconds | divided_by: 60 | modulo: 60 | floor | prepend: '00' | slice: -2, 2 }}:{{seconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
@@ -116,10 +132,20 @@ IIIF manifest: <a href="{{site.data[page.manifest_name].manifest.id}}">{{site.da
 
 <script>
   $('tr').on('click',function(){
-     var myDataAttr = $(this).find('td.timestamp').data('timestamp');
-     if (myDataAttr) {
-       myUV.extension.centerPanel.avcomponent.canvasInstances[0]._setCurrentTime(myDataAttr);
-       myUV.extension.centerPanel.avcomponent.play();
+     var mySelectorTimestamp = $(this).find('td.timestamp').data('timestamp');
+     var mySelectorEndTime = $(this).find('td.timestamp').data('endtime');
+     var myTarget = $(this).find('td.timestamp').data('target');
+     if (myTarget) {
+       target = myTarget + '#t=' + mySelectorTimestamp;
+       //if (mySelectorEndTime) {
+       //  target = myTarget + '#t=' + mySelectorTimestamp + ',' + mySelectorEndTime;
+       //}
+       console.log(target);
+       myUV.set({
+         target: target,
+       });       
+       //myUV.extension.centerPanel.avcomponent.canvasInstances[0]._setCurrentTime(myDataAttr);
+       //myUV.extension.centerPanel.avcomponent.play();
      }
    });
 
