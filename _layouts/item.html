@@ -3,6 +3,11 @@ layout: page
 ---
 
 {%- assign format = site.data[page.manifest_name].manifest.items[0].items[0].items[0].body.type -%}
+{%- if site.data[page.manifest_name].manifest.requiredStatement -%}
+  {%- assign make_big = true -%}
+{%- else -%}
+  {%- assign make_big = false -%}
+{%- endif -%}
 {{ content }}
 
 
@@ -10,7 +15,7 @@ layout: page
   The media file is not available
 
 {% else %}
-  <div id="uv" {%- if format == "Audio" or format == "Sound" -%} class="uv uv-audio sticky" {%- else -%} class="uv uv-video sticky" {%- endif -%}  ></div>
+  <div id="uv" {%- if make_big==false and format == "Audio" or format == "Sound" -%} class="uv uv-audio" {%- else -%} class="uv uv-video" {%- endif -%}  ></div>
 {% endif %}
   <script
     type="application/javascript"
@@ -54,7 +59,8 @@ layout: page
     </tr>
   </thead>
   <tbody>
-    {%- for annotation_page in site.data[page.manifest_name].manifest.items[0].annotations -%}
+    {%- for annotation_page_raw in site.data[page.manifest_name]['canvas-1'] -%}
+      {%- assign annotation_page = annotation_page_raw[1] -%}
       {%- if annotation_page.label.first -%}
         {% assign page_label = annotation_page.label.first[1] %}
       {% else %}
