@@ -65,7 +65,7 @@ layout: page
         {% assign portions = annotation_page.id | split: '/' %}
         {% assign real_slug = portions[7] | replace: ".json", "" %}
       {%- else -%}
-        {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_" %}
+        {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_"| replace: "-", "_" %}
       {%- endif -%}
 
       {%- for annotation in site.data[page.manifest_name].canvas-1[real_slug].items -%}
