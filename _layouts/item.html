@@ -82,10 +82,15 @@ layout: page
             {% assign target_array = annotation.target | split: 't=' %}
             {% assign timestamp_array = target_array[1] | split: ',' %}
           {% endif %}
+          {% if annotation.target.source %}
+            {% assign target_source = annotation.target.source %}
+          {% else %}
+            {% assign target_source = annotation.target %}
+          {% endif %}
           <td class="timestamp" 
               data-timestamp="{{timestamp_array[0]}}"  
               data-sort="{{timestamp_array[0]}}" 
-              data-target="{{annotation.target.source}}"
+              data-target="{{target_source}}"
               {% if timestamp_array[1] %}
                 data-endtime="{{timestamp_array[1]}}"  
               {% endif %}
