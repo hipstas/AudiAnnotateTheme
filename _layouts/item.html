@@ -50,6 +50,25 @@ layout: page
       });
 </script>
 
+
+{% assign annotation_page_array = "" | split: ',' %}
+
+{% for annotation_page_item in site.data.annotation_store %}
+  {% assign annotation_page_slug_raw = annotation_page_item[0] %}
+  {% assign annotation_page_slug_parts = annotation_page_slug_raw | split: page.manifest_name %}
+  {% if annotation_page_slug_parts.first == "" %}
+    {% assign annotation_page_array = annotation_page_array | push: annotation_page_item[1] %}
+  {% endif %}
+{% endfor %}
+
+
+{%- for annotation_page_raw in site.data[page.manifest_name]['canvas-1'] -%}
+  <!-- TODO move real_slug logic here? -->
+  {% assign annotation_page_array = annotation_page_array | push: annotation_page_raw[1] %}
+{% endfor %}
+
+
+
 <table id="annotation-table"  class="table table-bordered table-dark">
   <thead>
     <tr>
@@ -59,8 +78,7 @@ layout: page
     </tr>
   </thead>
   <tbody>
-    {%- for annotation_page_raw in site.data[page.manifest_name]['canvas-1'] -%}
-      {%- assign annotation_page = annotation_page_raw[1] -%}
+    {%- for annotation_page in annotation_page_array -%}
       {%- if annotation_page.label.first -%}
         {% assign page_label = annotation_page.label.first[1] %}
       {% else %}
@@ -74,7 +92,7 @@ layout: page
         {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_"| replace: "-", "_" %}
       {%- endif -%}
 
-      {%- for annotation in site.data[page.manifest_name].canvas-1[real_slug].items -%}
+      {%- for annotation in annotation_page.items -%}
         <tr>
           {% if annotation.target.selector %}
             {% assign timestamp_array = annotation.target.selector.t | split: ',' %}
