@@ -1,0 +1,14 @@
+---
+layout: page
+---
+ <div>
+   <h2>Annotation Index</h2>
+   {%- for term in site.terms -%}
+    {%- if term.title -%}
+      <div>
+        <a class="page-link" href="{{ term.url | relative_url }}">{{ term.title | escape }}</a>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+</div>
+

@@ -1,0 +1,290 @@
+---
+layout: page
+---
+{{ content }}
+
+<h2>
+  Annotations for "{{ page.index_term }}"
+</h2>
+
+<!-- TODO handle formats, unavailable manifests -->
+  <div id="uv" class="uv uv-audio sticky"></div>
+  <script
+    type="application/javascript"
+    src="https://universalviewer-git-fork-brumfieldlabs-load-a-a3d751-mnemoscene.vercel.app/umd/UV.js"
+  ></script>
+  <script src="{{ site.baseurl }}/assets/datatables/datatables.min.js"></script>
+  <script>
+    var myUV;
+
+    myUV = UV.init('uv', {
+        root: '../../{{ site.baseurl }}/assets/uv/umd'
+    });
+
+
+
+      // override config using an inline json object
+      myUV.on("configure", function ({ config, cb }) {
+        cb({
+            "options": {
+              "dropEnabled": true,
+              "footerPanelEnabled": false,
+              "headerPanelEnabled": false,
+              "leftPanelEnabled": false,
+              "limitLocales": false,
+              "overrideFullScreen": false,
+              "pagingEnabled": false,
+              "rightPanelEnabled": false
+             }
+        });
+      });
+</script>
+
+<!-- 
+Steps to reorganize this for new annotation format 
+x 1) Separate load logic from display logic in old annotation code
+2) Add new annotation code load logic
+3) Reorder based on navigation order, timestamp
+4) Test for double-click on manifest load (of second/third item)
+
+-->
+
+<!-- create an array of [manifest label, annotation_page] tuples.  TODO: revise first two to label/url actually needed -->
+{% assign annotation_page_tuple_array = "" | split: ',' %}
+
+
+<!-- load array from old-style annotation storage -->
+{%- for datafile in site.data -%}
+  {% if datafile %}
+    {% assign filename = datafile[0] %}
+    {% assign filedata = datafile[1] %}
+    {% assign file_label = filedata.manifest.label['en'] %}
+    {% if filename != 'collection' and filename != 'navigation' and filename != 'annotation_store'%}
+
+      {%- for annotation_page in filedata.manifest.items[0].annotations -%}
+
+        {%- if annotation_page.id contains site.github_username -%}
+          {% assign portions = annotation_page.id | split: '/' %}
+          {% assign real_slug = portions[7] | replace: ".json", "" %}
+        {%- else -%}
+          {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_" %}
+        {%- endif -%}
+
+        {%- assign real_annotation_page = site.data[filename].canvas-1[real_slug] -%}
+
+        {%- assign tuple = "" | split: ',' -%}
+        {%- assign tuple = tuple | push: file_label -%}
+        {%- assign tuple = tuple | push: real_annotation_page -%}
+        {%- assign annotation_page_tuple_array = annotation_page_tuple_array | push: tuple -%}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<!-- load array for new-style storage -->
+{% for annotation_page_item in site.data.annotation_store %}
+  {% assign annotation_page_slug_raw = annotation_page_item[0] %}
+  {%- for collection_item in site.annotation_pages -%}
+    {%- if collection_item.slug == annotation_page_slug_raw -%}
+      {%- assign manifest_label = collection_item.manifest_label -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- assign real_annotation_page = annotation_page_item[1] -%}
+
+  {%- assign tuple = "" | split: ',' -%}
+  {%- assign tuple = tuple | push: manifest_label -%}
+  {%- assign tuple = tuple | push: real_annotation_page -%}
+  {%- assign annotation_page_tuple_array = annotation_page_tuple_array | push: tuple -%}
+
+{% endfor %}
+
+
+
+<!-- button id="playAllButton">Play All</button -->
+
+<table id="annotation-table"  class="table table-bordered table-dark">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th style="width: 20%;">Time</th>
+      <th>Annotation</th>
+      <th>Layer</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for annotation_page_tuple in annotation_page_tuple_array -%}
+      {%- assign manifest_label = annotation_page_tuple[0] -%}
+
+
+
+      {%- assign annotation_page = annotation_page_tuple[1] -%}
+        {%- for annotation in annotation_page.items -%}
+          {%- if annotation.body['type'] -%}
+          {% else %}
+            {% assign body = "" %}
+            {%- for raw_body in annotation.body -%}
+              {% if raw_body['purpose'] == 'tagging' and raw_body.value == page.index_term %}
+                {%- for raw_body_again in annotation.body -%}
+                  {% if raw_body_again['purpose'] != 'tagging' %}
+                    <tr>
+                      {%- assign target_portions =  annotation['target']['source'] | split: '/' -%}
+                      {%- assign target_slug =  target_portions[4] -%}
+                      <td>
+                        <a href="{{target_slug | relative_url}}">{{ manifest_label }}</a>
+                      </td>
+                      {% if annotation.target.selector %}
+                        {% assign timestamp_array = annotation.target.selector.t | split: ',' %}
+                      {% else %}
+                        {% assign target_array = annotation.target | split: 't=' %}
+                        {% assign timestamp_array = target_array[1] | split: ',' %}
+                      {% endif %}
+                      <td class="timestamp" 
+                          data-timestamp="{{timestamp_array[0]}}"  
+                          data-sort="{{timestamp_array[0]}}" 
+                          data-target="{{annotation.target.source}}"
+                          {% if timestamp_array[1] %}
+                            data-endtime="{{timestamp_array[1]}}"  
+                          {% endif %}
+                          data-manifest="{{site.data[filename].manifest.id}}"
+                      >
+                       {% assign seconds = timestamp_array[0] | times: 1 %}
+                        {% if seconds >= 3600 %}
+                          {{ seconds | divided_by: 3600 | floor }}:{{seconds | divided_by: 60 | modulo: 60 | floor | prepend: '00' | slice: -2, 2 }}:{{seconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+                        {% else %}
+                          {{seconds | divided_by: 60 | modulo: 60 | floor }}:{{seconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+                        {% endif %}
+                        {% if timestamp_array[1] %}
+                          {% assign endseconds = timestamp_array[1] | times: 1 %}
+                          - 
+                            {% if endseconds >= 3600 %}
+                              {{ endseconds | divided_by: 3600 | floor }}:{{endseconds | divided_by: 60 | modulo: 60 | floor | prepend: '00' | slice: -2, 2 }}:{{endseconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+                            {% else %}
+                              {{endseconds | divided_by: 60 | modulo: 60 | floor }}:{{endseconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+                            {% endif %}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {%- if annotation.body['type'] -%}
+                          {% assign body = annotation.body.value %}
+                        {% else %}
+                          {% assign body = "" %}
+                          {%- for raw_body in annotation.body -%}
+                            {% if raw_body['purpose'] != 'tagging' %}
+                              {% assign body = body | append: raw_body.value | append: "<br/>" %}
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+
+                        {{body | newline_to_br}}
+                      </td>
+                      <td>{{page_label}}</td>
+                    </tr>
+
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {%- endfor -%}
+      {%- endfor -%}
+  </tbody>
+</table>
+
+<div>
+
+
+<script>
+ 
+  function playRow(element) {
+     var mySelectorTimestamp = element.find('td.timestamp').data('timestamp');
+     var mySelectorEndTime = element.find('td.timestamp').data('endtime');
+     var myTarget = element.find('td.timestamp').data('target');
+     var myManifest = element.find('td.timestamp').data('manifest');
+     if (myTarget) {
+       target = myTarget + '#t=' + mySelectorTimestamp;
+       //if (mySelectorEndTime) {
+       //  target = myTarget + '#t=' + mySelectorTimestamp + ',' + mySelectorEndTime;
+       //}
+       console.log(target);
+
+      if(true) {
+       myUV.set({
+         target: target,
+          manifestUri: myManifest,
+          manifest: myManifest,
+          iiifManifestId: myManifest,
+          canvasIndex: 0,
+          annotations: [],
+          locales: [{ name: 'en-GB', label: 'English' }, { name: 'cy-GB', label: 'Welsh' }]
+        });
+      }
+     }
+   };
+
+
+
+  $('tr').on('click',function(){
+    playRow($(this));
+  });
+
+
+  function setFirstRow() {
+    var firstRow = $($('#annotation-table').find("tr")[1]);
+    var myManifest = firstRow.find('td.timestamp').data('manifest');
+ 
+     myUV.set({
+        manifestUri: myManifest,
+        manifest: myManifest,
+        iiifManifestId: myManifest,
+        canvasIndex: 0,
+        annotations: [],
+        locales: [{ name: 'en-GB', label: 'English' }, { name: 'cy-GB', label: 'Welsh' }]
+      });
+  }
+
+  var rowStack = [];
+  function playStack() {
+    if(rowStack.length > 0) {
+      var nextRow = rowStack.shift();
+      console.log((new Date()).getSeconds());
+      playRow(nextRow['row']);
+      console.log('Scheduling for ' + nextRow['delay']);
+      setTimeout(playStack, nextRow['delay']);
+    }
+  };
+
+  $('#playAllButton').on('click', function(){
+    rowStack = [];  // clear the queue
+    var lastDuration = 0.0;
+    $('#annotation-table tr').each(function() {
+      var element = $(this);
+
+      var timestampStart = element.find('td.timestamp').data('timestamp');
+      if (timestampStart) { // header row should be skipped
+        rowStack.push({ 'row': element, 'delay': lastDuration});
+
+        var mySelectorTimestamp = element.find('td.timestamp').data('timestamp');
+        var mySelectorEndTime = element.find('td.timestamp').data('endtime');
+        if (!mySelectorEndTime) {
+          lastDuration = 2000; // make point annotations play for 2 seconds
+        } else {
+          lastDuration = (mySelectorEndTime - mySelectorTimestamp) * 1000;
+        }
+      }
+
+
+//      ms = playRow($(this));
+//      setTimeout(ms,playRow($(this)));
+    });
+    playStack(rowStack);
+
+  });
+
+
+$(document).ready( function() {
+    $('#annotation-table').DataTable({ paging: false });
+    setFirstRow();
+} );
+ </script>
+
+
