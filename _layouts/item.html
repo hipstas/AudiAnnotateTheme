@@ -135,7 +135,13 @@ layout: page
             {% else %}
               {% assign body = "" %}
               {%- for raw_body in annotation.body -%}
-                {% assign body = body | append: raw_body.value | append: "<br/>" %}
+                {% if raw_body.purpose == "tagging" %}
+                  {% assign tag_slug = raw_body.value | slugify %}
+                  {% assign tag_link = '<a href="../index/' | append: tag_slug | append: '">#' | append: raw_body.value | append: '</a>' %}
+                  {% assign body = body | append: tag_link | append: " " %}
+                {% else %}
+                  {% assign body = body | append: raw_body.value | append: "<br/>" %}
+                {% endif %}
               {% endfor %}
             {% endif %}
 
