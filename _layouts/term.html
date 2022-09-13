@@ -118,6 +118,12 @@ x 1) Separate load logic from display logic in old annotation code
 
 
       {%- assign annotation_page = annotation_page_tuple[1] -%}
+      {%- if annotation_page.label.first -%}
+        {% assign page_label = annotation_page.label.first[1] %}
+      {% else %}
+        {% assign page_label = annotation_page.label %}
+      {% endif %}
+
         {%- for annotation in annotation_page.items -%}
           {%- if annotation.body['type'] -%}
           {% else %}
