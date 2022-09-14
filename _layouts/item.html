@@ -74,6 +74,7 @@ layout: page
     <tr>
       <th style="width: 20%;">Time</th>
       <th>Annotation</th>
+      <th>Index Terms</th>
       <th>Layer</th>
     </tr>
   </thead>
@@ -133,19 +134,26 @@ layout: page
             {%- if annotation.body['type'] -%}
               {% assign body = annotation.body.value %}
             {% else %}
-              {% assign body = "" %}
+            {% endif %}
+
+            {{body | newline_to_br}}
+          </td>
+          <td>
+            {% assign tag_body = "" %}
+            {%- if annotation.body['type'] -%}
+            {% else %}
               {%- for raw_body in annotation.body -%}
                 {% if raw_body.purpose == "tagging" %}
                   {% assign tag_slug = raw_body.value | slugify %}
-                  {% assign tag_link = '<a href="../index/' | append: tag_slug | append: '">#' | append: raw_body.value | append: '</a>' %}
-                  {% assign body = body | append: tag_link | append: " " %}
+                  {% assign tag_url = '/index/' | append: tag_slug  | relative_url %}
+                  {% assign tag_link = '<a href="' | append: tag_url | append: '">' | append: raw_body.value | append: '</a>' %}
+                  {% assign tag_body = tag_body | append: tag_link | append: " " %}
                 {% else %}
-                  {% assign body = body | append: raw_body.value | append: "<br/>" %}
                 {% endif %}
               {% endfor %}
             {% endif %}
 
-            {{body | newline_to_br}}
+            {{tag_body | newline_to_br}}
           </td>
           <td>{{page_label}}</td>
         </tr>
