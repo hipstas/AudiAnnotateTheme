@@ -53,50 +53,67 @@ x 1) Separate load logic from display logic in old annotation code
 {% assign annotation_page_tuple_array = "" | split: ',' %}
 
 
-<!-- load array from old-style annotation storage -->
-{%- for datafile in site.data -%}
-  {% if datafile %}
-    {% assign filename = datafile[0] %}
-    {% assign filedata = datafile[1] %}
-    {% assign file_label = filedata.manifest.label['en'] %}
-    {% if filename != 'collection' and filename != 'navigation' and filename != 'annotation_store'%}
+{% for page_path in site.data.navigation %}
+  {%- assign my_page = site.pages | where: "path", page_path | first -%}
+  {% assign manifest_slug = my_page.manifest_name %}
 
-      {%- for annotation_page in filedata.manifest.items[0].annotations -%}
-
-        {%- if annotation_page.id contains site.github_username -%}
-          {% assign portions = annotation_page.id | split: '/' %}
-          {% assign real_slug = portions[7] | replace: ".json", "" %}
-        {%- else -%}
-          {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_" %}
+  <!-- load array for new-style annotation storage -->
+  {% for annotation_page_item in site.data.annotation_store %}
+    {% assign annotation_page_slug_raw = annotation_page_item[0] %}
+    <!-- test if the annotation page slug begins with manifest slug -->
+    {% assign page_slug_parts = annotation_page_slug_raw | split: manifest_slug %}
+    {% if page_slug_parts[0] == "" %}
+      {%- for collection_item in site.annotation_pages -%}
+        {%- if collection_item.slug == annotation_page_slug_raw -%}
+          {%- assign manifest_label = collection_item.manifest_label -%}
         {%- endif -%}
-
-        {%- assign real_annotation_page = site.data[filename].canvas-1[real_slug] -%}
-
-        {%- assign tuple = "" | split: ',' -%}
-        {%- assign tuple = tuple | push: file_label -%}
-        {%- assign tuple = tuple | push: real_annotation_page -%}
-        {%- assign annotation_page_tuple_array = annotation_page_tuple_array | push: tuple -%}
       {%- endfor -%}
-    {%- endif -%}
-  {%- endif -%}
-{%- endfor -%}
+      {%- assign real_annotation_page = annotation_page_item[1] -%}
 
-<!-- load array for new-style storage -->
-{% for annotation_page_item in site.data.annotation_store %}
-  {% assign annotation_page_slug_raw = annotation_page_item[0] %}
-  {%- for collection_item in site.annotation_pages -%}
-    {%- if collection_item.slug == annotation_page_slug_raw -%}
-      {%- assign manifest_label = collection_item.manifest_label -%}
+      {%- assign tuple = "" | split: ',' -%}
+      {%- assign tuple = tuple | push: manifest_label -%}
+      {%- assign tuple = tuple | push: real_annotation_page -%}
+      {%- assign tuple = tuple | push: forloop.index -%}
+      {%- assign annotation_page_tuple_array = annotation_page_tuple_array | push: tuple -%}
+    {% endif %}
+  {% endfor %}
+
+  <!-- load array from old-style annotation storage -->
+  {%- for datafile in site.data -%}
+
+    {% assign filename = datafile[0] %}
+    {% if filename == manifest_slug %}
+      {% assign filedata = datafile[1] %}
+      {% assign file_label = filedata.manifest.label['en'] %}
+      {% if filename != 'collection' and filename != 'navigation' and filename != 'annotation_store'%}
+
+        {%- for annotation_page in filedata.manifest.items[0].annotations -%}
+
+          {%- if annotation_page.id contains site.github_username -%}
+            {% assign portions = annotation_page.id | split: '/' %}
+            {% assign real_slug = portions[7] | replace: ".json", "" %}
+          {%- else -%}
+            {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_" %}
+          {%- endif -%}
+
+          {%- assign real_annotation_page = site.data[filename].canvas-1[real_slug] -%}
+
+          {%- assign tuple = "" | split: ',' -%}
+          {%- assign tuple = tuple | push: file_label -%}
+          {%- assign tuple = tuple | push: real_annotation_page -%}
+          {%- assign tuple = tuple | push: forloop.index -%}
+          {%- assign annotation_page_tuple_array = annotation_page_tuple_array | push: tuple -%}
+        {%- endfor -%}
+      {%- endif -%}
     {%- endif -%}
   {%- endfor -%}
-  {%- assign real_annotation_page = annotation_page_item[1] -%}
 
-  {%- assign tuple = "" | split: ',' -%}
-  {%- assign tuple = tuple | push: manifest_label -%}
-  {%- assign tuple = tuple | push: real_annotation_page -%}
-  {%- assign annotation_page_tuple_array = annotation_page_tuple_array | push: tuple -%}
 
+  
 {% endfor %}
+
+
+
 
 
 
@@ -114,10 +131,8 @@ x 1) Separate load logic from display logic in old annotation code
   <tbody>
     {%- for annotation_page_tuple in annotation_page_tuple_array -%}
       {%- assign manifest_label = annotation_page_tuple[0] -%}
-
-
-
       {%- assign annotation_page = annotation_page_tuple[1] -%}
+      {%- assign manifest_index = annotation_page_tuple[2] -%}
       {%- if annotation_page.label.first -%}
         {% assign page_label = annotation_page.label.first[1] %}
       {% else %}
@@ -135,7 +150,7 @@ x 1) Separate load logic from display logic in old annotation code
                     <tr>
                       {%- assign target_portions =  annotation['target']['source'] | split: '/' -%}
                       {%- assign target_slug =  target_portions[4] -%}
-                      <td>
+                      <td data-sort="{{manifest_index}}">
                         <a href="{{target_slug | relative_url}}">{{ manifest_label }}</a>
                       </td>
                       {% if annotation.target.selector %}
