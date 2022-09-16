@@ -134,6 +134,12 @@ layout: page
             {%- if annotation.body['type'] -%}
               {% assign body = annotation.body.value %}
             {% else %}
+              {%- for raw_body in annotation.body -%}
+                {% if raw_body.purpose contains "tagging" %}
+                {% else %}
+                  {% assign body = raw_body.value %}                
+                {% endif %}
+              {% endfor %}
             {% endif %}
 
             {{body | newline_to_br}}
