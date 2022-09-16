@@ -3,6 +3,9 @@
   {%- if page.layout != 'home' -%}
     <nav class="site-nav">
       <div class="trigger">
+        {%- if site.terms.sizem!= 0 -%}
+          Items
+        {%- endif -%}
         {%- for path in page_paths -%}
           {%- assign my_page = site.pages | where: "path", path | first -%}
           {%- if my_page.title -%}
@@ -12,7 +15,22 @@
           {%- endif -%}
         {%- endfor -%}
       </div>
+
+      {%- if site.terms.size != 0 -%}
+         <div class="trigger">
+           <a class="page-link" href="{{page_url index-terms}}">Index</a>
+           {%- for term in site.terms -%}
+            {%- if term.title -%}
+              <div>
+                <a class="page-link" href="{{ term.url | relative_url }}">{{ term.title | escape }}</a>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+  
     </nav>
   {%- endif -%}
+ 
 {%- endif -%}
 
