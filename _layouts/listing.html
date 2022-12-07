@@ -1,8 +1,11 @@
 ---
 layout: page
 ---
- <div>
+<div>
    <h2>Annotation Index</h2>
+  {{ content }}
+
+
    {%- for term in site.terms -%}
     {%- if term.title -%}
       <div>
@@ -10,5 +13,7 @@ layout: page
       </div>
     {%- endif -%}
   {%- endfor -%}
+
+
 </div>
 

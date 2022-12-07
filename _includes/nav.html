@@ -17,16 +17,10 @@
       </div>
 
       {%- if site.terms.size != 0 -%}
-         <div class="trigger">
-           <a class="page-link" href="{{page_url index-terms}}">Index</a>
-           {%- for term in site.terms -%}
-            {%- if term.title -%}
-              <div>
-                <a class="page-link" href="{{ term.url | relative_url }}">{{ term.title | escape }}</a>
-              </div>
-            {%- endif -%}
-          {%- endfor -%}
+        <div>
+          <a class="page-link" href="{{ 'term_index' | relative_url}}">index</a>
         </div>
+
       {%- endif -%}
   
     </nav>
