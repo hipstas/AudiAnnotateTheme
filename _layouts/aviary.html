@@ -1,0 +1,13 @@
+---
+layout: page
+---
+
+{{ content }}
+<div class="aviary-wrapper">
+<iframe src="https://iiif.aviaryplatform.com/player?manifest={{site.data[page.manifest_name].manifest.id}}" width="100%" height="100%" name="iframe"” title="This is my video" scrolling="no"></iframe>
+</div>
+
+IIIF manifest: <a href="{{site.data[page.manifest_name].manifest.id}}">{{site.data[page.manifest_name].manifest.id}}</a><br/>
+<a href="https://iiif.aviaryplatform.com/player?manifest={{site.data[page.manifest_name].manifest.id}}">Aviary Player</a>
+
+
