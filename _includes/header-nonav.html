@@ -1,0 +1,32 @@
+<header class="site-header" role="banner">
+
+  <div class="wrapper">
+    {%- assign default_paths = site.pages | map: "path" -%}
+    {%- assign page_paths = site.data.navigation | default: default_paths -%}
+    <a class="site-title" rel="author" href="{{ "/" | relative_url }}">{{ site.data.collection.label.en[0] }}</a>
+
+      <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/datatables/datatables.min.css">
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/universalviewer@next/dist/uv.css"
+      />
+      <style>
+          .uv-audio {
+              width: 100%;
+              height: 120px;
+          }
+          .uv-video {
+              width: 100%;
+              height: 600px;
+          }
+          .sticky {
+              position: -webkit-sticky; /* Safari */
+              position: sticky;
+              top: 0;
+        z-index: 1;
+          }
+      </style>
+
+  </div>
+</header>
