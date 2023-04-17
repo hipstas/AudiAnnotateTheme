@@ -1,7 +1,14 @@
 {%- if page_paths -%}
   
   {%- if page.layout != 'home' -%}
-    <nav class="site-nav">
+  <!--{% include toggle-menu.html %}-->
+    <nav class="site-nav" id="site-nav-menu">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" id="close-sidebar-icon">&times;</a>
+	  <style>
+	    div {
+	      color: white;
+	    }
+	  </style>
       <div class="trigger">
         {%- if site.terms.sizem!= 0 -%}
           Items
