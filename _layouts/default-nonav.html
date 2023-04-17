@@ -3,7 +3,7 @@
   {%- include head.html -%}
   <body>
 	    
-    {%- include header.html -%}
+    {%- include header-nonav.html -%}
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
@@ -19,13 +19,11 @@
 	  const close = document.getElementById("close-sidebar-icon");
 	      
 	  link.addEventListener("click", function() {
-	    div.style.display = "block";
 	  	div.style.width = "250px";
 	  });
 	  
 	  close.addEventListener("click", function() {
 	  	div.style.width = "0";
-	  	div.style.display = "none";
 	  });
 	</script>
 	    

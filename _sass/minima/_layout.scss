@@ -36,6 +36,14 @@
   border: 1px solid $border-color-01;
   border-radius: 5px;
   text-align: right;
+  
+  .trigger {
+    text-color: #f1f1f1;
+  }
+  
+  .closebtn {
+
+  }
 
   .nav-trigger {
     display: none;
@@ -74,7 +82,7 @@
   }
 
   .page-link {
-    color: $text-color;
+    color: #f1f1f1;
     line-height: $base-line-height;
     display: block;
     padding: 5px 10px;
