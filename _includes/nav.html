@@ -9,6 +9,11 @@
 	      color: white;
 	    }
 	  </style>
+    {%- if site.parent_site.title -%}
+      <div class="trigger">
+        <a class="page-link" href="{{ site.parent_site.url }}">{{ site.parent_site.title }}</a>
+      </div>
+    {%- endif -%}
       <div class="trigger">
         {%- if site.terms.sizem!= 0 -%}
           Items
