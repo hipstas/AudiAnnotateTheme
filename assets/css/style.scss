@@ -17,6 +17,10 @@
   padding-top: 55px;
 }
 
+.site-nav-open {
+  z-index: 500;
+}
+
 .site-nav div {
   padding-left: 1em;
   padding-top: 0.5em;
@@ -24,7 +28,6 @@
   line-height: 1.5em;
   text-align: left;
   background-color: #111;
-  z-index: 2;
   text-color: #f1f1f1;
   color: white;
 }

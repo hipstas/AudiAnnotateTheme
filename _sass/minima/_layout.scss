@@ -17,6 +17,7 @@
   letter-spacing: -1px;
   margin-bottom: 0;
   float: left;
+  padding-left: 5px;
 
   @include media-query($on-palm) {
     padding-right: 45px;
@@ -69,6 +70,7 @@
     height: 36px;
     z-index: 2;
     cursor: pointer;
+    padding: 0px 8px 0px 0px
   }
 
   input ~ .trigger {
@@ -122,6 +124,10 @@
       margin-left: auto;
     }
   }
+}
+
+.site-nav-open {
+  z-index: 500;
 }
 
 
