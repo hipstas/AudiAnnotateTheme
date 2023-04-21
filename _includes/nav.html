@@ -3,7 +3,7 @@
   {%- if page.layout != 'home' -%}
   <!--{% include toggle-menu.html %}-->
     <nav class="site-nav" id="site-nav-menu">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" id="close-sidebar-icon">&times;</a>
+    <a href="javascript:void(0)" class="closebtn" id="close-sidebar-icon">&times;</a>
     {%- if site.parent_site.title -%}
       <div class="trigger">
         <a class="page-link" href="{{ site.parent_site.url }}">{{ site.parent_site.title }}</a>
