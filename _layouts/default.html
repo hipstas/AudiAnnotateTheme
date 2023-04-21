@@ -21,13 +21,13 @@
 	  link.addEventListener("click", function() {
 	    div.style.display = "block";
 	  	div.style.width = "250px";
-	  	div.classList.toggle("site-nav-open");
+	  	div.style.zIndex = 5;
 	  });
 	  
 	  close.addEventListener("click", function() {
 	  	div.style.width = "0";
 	  	div.style.display = "none";
-	  	div.classList.toggle("site-nav-open");
+	  	div.style.zIndex = 0;
 	  });
 	</script>
 	    
