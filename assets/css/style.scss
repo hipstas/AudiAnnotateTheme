@@ -9,11 +9,12 @@
 
 .site-nav {
   height: 100%;
-  width: 25em;
+  width: 0;
+  display: none;
   position: absolute;
   left: 0;
   top: 0;
-  padding-top: 40px;
+  padding-top: 55px;
 }
 
 .site-nav div {
@@ -22,11 +23,30 @@
   display: block;
   line-height: 1.5em;
   text-align: left;
+  background-color: #111;
+  text-color: #f1f1f1;
+  color: white;
+}
+
+.site-nav a {
+  line-height: 10px;
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  color: #f1f1f1;
+  display: block;
+  transition: 0.3s;
+  background-color: #111;
+  z-index: 1;
+  text-color: #f1f1f1;
+}
+
+.site-nav a:hover {
+  color: #f1f1f1;
 }
 
 // wrapper for header and main divs
 .wrapper {
-  padding-left: 26em;
+  padding-left: 1em;
   max-width: 95%;
 }
 .aviary-wrapper {

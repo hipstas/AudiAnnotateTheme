@@ -17,6 +17,7 @@
   letter-spacing: -1px;
   margin-bottom: 0;
   float: left;
+  padding-left: 5px;
 
   @include media-query($on-palm) {
     padding-right: 45px;
@@ -36,6 +37,14 @@
   border: 1px solid $border-color-01;
   border-radius: 5px;
   text-align: right;
+  
+  .trigger {
+    text-color: #f1f1f1;
+  }
+  
+  .closebtn {
+
+  }
 
   .nav-trigger {
     display: none;
@@ -61,6 +70,7 @@
     height: 36px;
     z-index: 2;
     cursor: pointer;
+    padding: 0px 8px 0px 0px
   }
 
   input ~ .trigger {
@@ -74,7 +84,7 @@
   }
 
   .page-link {
-    color: $text-color;
+    color: #f1f1f1;
     line-height: $base-line-height;
     display: block;
     padding: 5px 10px;
