@@ -7,6 +7,19 @@
   "minima/initialize";
 
 
+.button {
+  background-color: black; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  margin: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
 .site-nav {
   height: 100%;
   width: 0;

@@ -22,6 +22,7 @@ layout: page
     src="https://universalviewer-git-fork-brumfieldlabs-load-a-a3d751-mnemoscene.vercel.app/umd/UV.js"
   ></script>
   <script src="{{ site.baseurl }}/assets/datatables/datatables.min.js"></script>
+
   <script>
     var myUV;
 
@@ -31,6 +32,7 @@ layout: page
         root: '../../{{ site.baseurl }}/assets/uv/umd'
     });
 
+    console.log(`instatntiation post UV.init`);
 
 
       // override config using an inline json object
@@ -48,7 +50,10 @@ layout: page
              }
         });
       });
+      console.log(`instatntiation calling myUV.configure with manifest={{site.data[page.manifest_name].manifest.id}}`);
+
 </script>
+
 
 
 {% assign annotation_page_array = "" | split: ',' %}
@@ -67,6 +72,9 @@ layout: page
   {% assign annotation_page_array = annotation_page_array | push: annotation_page_raw[1] %}
 {% endfor %}
 
+
+
+<button id="playAllButton" class="button">Play All</button>
 
 
 <table id="annotation-table"  class="table table-bordered table-dark">
@@ -112,6 +120,8 @@ layout: page
               {% if timestamp_array[1] %}
                 data-endtime="{{timestamp_array[1]}}"  
               {% endif %}
+              data-manifest="{{site.data[page.manifest_name].manifest.id}}"
+
           >
            {% assign seconds = timestamp_array[0] | times: 1 %}
             {% if seconds >= 3600 %}
@@ -159,31 +169,12 @@ layout: page
 IIIF manifest: <a href="{{site.data[page.manifest_name].manifest.id}}">{{site.data[page.manifest_name].manifest.id}}</a>
 </div>
 
+{%- include player_tools.html -%}
 
 <script>
-  $('tr').on('click',function(){
-     var mySelectorTimestamp = $(this).find('td.timestamp').data('timestamp');
-     var mySelectorEndTime = $(this).find('td.timestamp').data('endtime');
-     var myTarget = $(this).find('td.timestamp').data('target');
-     if (myTarget) {
-       target = myTarget + '#t=' + mySelectorTimestamp;
-       //if (mySelectorEndTime) {
-       //  target = myTarget + '#t=' + mySelectorTimestamp + ',' + mySelectorEndTime;
-       //}
-       console.log(target);
-       myUV.set({
-         target: target,
-       });       
-       //myUV.extension.centerPanel.avcomponent.canvasInstances[0]._setCurrentTime(myDataAttr);
-       //myUV.extension.centerPanel.avcomponent.play();
-     }
-   });
-
-$(document).ready( function() {
-    $('#annotation-table').DataTable(
-  { paging: false }
-);
-} );
+  $(document).ready( function() {
+      $('#annotation-table').DataTable({ paging: false });
+  } );
  </script>
 
 

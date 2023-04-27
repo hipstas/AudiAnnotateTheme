@@ -1,0 +1,135 @@
+<script>
+ 
+  function playRow(element) {
+     var mySelectorTimestamp = element.find('td.timestamp').data('timestamp');
+     var mySelectorEndTime = element.find('td.timestamp').data('endtime');
+     var myTarget = element.find('td.timestamp').data('target');
+     var myManifest = element.find('td.timestamp').data('manifest');
+     if (myTarget) {
+       target = myTarget + '#t=' + mySelectorTimestamp;
+       //if (mySelectorEndTime) {
+       //  target = myTarget + '#t=' + mySelectorTimestamp + ',' + mySelectorEndTime;
+       //}
+       console.log(target);
+       buttonPressIteration = -1;
+
+      if(true) {
+       myUV.set({
+         target: target,
+          manifestUri: myManifest,
+          manifest: myManifest,
+          iiifManifestId: myManifest,
+          canvasIndex: 0,
+          annotations: [],
+          locales: [{ name: 'en-GB', label: 'English' }, { name: 'cy-GB', label: 'Welsh' }]
+        });
+      }
+     }
+   };
+
+
+
+  $('tr').on('click',function(){
+    playRow($(this));
+  });
+
+  $('#uv').on('click', function(){
+    buttonPressIteration=-1;
+  });
+
+  function setFirstRow() {
+    var firstRow = $($('#annotation-table').find("tr")[1]);
+    var myManifest = firstRow.find('td.timestamp').data('manifest');
+    console.log(`setFirstRow calling myUV.set with manifestUri: ${myManifest}`);
+
+     myUV.set({
+        manifestUri: myManifest,
+        manifest: myManifest,
+        iiifManifestId: myManifest,
+        canvasIndex: 0,
+        annotations: [],
+        locales: [{ name: 'en-GB', label: 'English' }, { name: 'cy-GB', label: 'Welsh' }]
+      });
+
+  }
+
+  var rowStack = [];
+  var buttonPressIteration = 0;
+
+  function playStack() {
+    var accumulation = 0;
+
+    for (let i = 0; i < rowStack.length; i++) {
+      accumulation = accumulation+rowStack[i].delay;
+      console.log(`incremented accumulation to ${accumulation}`);
+
+      setTimeout((element, myIteration) => {
+       if(myIteration==buttonPressIteration) {
+         mySelectorTimestamp = element.find('td.timestamp').data('timestamp');
+          //var mySelectorEndTime = element.find('td.timestamp').data('endtime');
+         myTarget = element.find('td.timestamp').data('target');
+         myManifest = element.find('td.timestamp').data('manifest');
+         target = myTarget + '#t=' + mySelectorTimestamp;
+         console.log(`Setting UV to ${target}\n`);
+
+
+         myUV.set({
+           target: target,
+            manifestUri: myManifest,
+            manifest: myManifest,
+            iiifManifestId: myManifest,
+            canvasIndex: 0,
+            annotations: [],
+            locales: [{ name: 'en-GB', label: 'English' }, { name: 'cy-GB', label: 'Welsh' }]
+          });
+        };
+      }, accumulation, rowStack[i].row, buttonPressIteration);
+    };
+
+    // Pause the player after the last annotation
+    var element = rowStack[rowStack.length-1].row;
+    var lastStart = element.find('td.timestamp').data('timestamp')
+    var lastEnd = element.find('td.timestamp').data('endtime');
+    var lastLength = (lastEnd - lastStart) * 1000;
+    pausePoint = accumulation+lastLength;
+    console.log(`planning to pause at ${pausePoint}`)
+    setTimeout((element) => {
+      console.log(`pausing at ${pausePoint}`)
+      myUV.extension.centerPanel.player.pause();
+    }, pausePoint);
+   
+
+  };
+  
+
+  $('#playAllButton').on('click', function(){
+    rowStack = [];  // clear the queue
+    buttonPressIteration+=1;
+
+    var lastDuration = 1;
+    $('#annotation-table tr').each(function() {
+      var element = $(this);
+
+      var timestampStart = element.find('td.timestamp').data('timestamp');
+      if (timestampStart) { // header row should be skipped
+        rowStack.push({ 'row': element, 'delay': lastDuration});
+
+        var mySelectorTimestamp = element.find('td.timestamp').data('timestamp');
+        var mySelectorEndTime = element.find('td.timestamp').data('endtime');
+        if (!mySelectorEndTime) {
+          lastDuration = 5000; // make point annotations play for 5 seconds
+        } else {
+          lastDuration = (mySelectorEndTime - mySelectorTimestamp) * 1000;
+        }
+      }
+
+
+//      ms = playRow($(this));
+//      setTimeout(ms,playRow($(this)));
+    });
+    playStack(rowStack);
+
+  });
+
+ </script>
+
