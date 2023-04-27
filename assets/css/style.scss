@@ -44,11 +44,17 @@
   color: #f1f1f1;
 }
 
-// wrapper for header and main divs
+// wrapper for header and no-nav main divs
 .wrapper {
   padding-left: 1em;
   max-width: 95%;
 }
+// wrapper for main divs
+.inside-wrapper {
+  padding-left: 4em;
+  max-width: 95%;
+}
+
 .aviary-wrapper {
   width: 100%;
   height: 75vh;
