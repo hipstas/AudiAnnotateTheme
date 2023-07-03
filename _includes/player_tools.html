@@ -13,7 +13,6 @@
        console.log(target);
        buttonPressIteration = -1;
 
-      if(true) {
        myUV.set({
          target: target,
           manifestUri: myManifest,
@@ -23,7 +22,12 @@
           annotations: [],
           locales: [{ name: 'en-GB', label: 'English' }, { name: 'cy-GB', label: 'Welsh' }]
         });
-      }
+        if(myUV.extension.centerPanel.player.isVideo) {
+          var divElement = document.getElementById("uv");
+          divElement.classList.remove("uv-audio");
+          divElement.classList.add("uv-video");
+          myUV.resize();
+        }
      }
    };
 
