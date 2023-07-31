@@ -1,0 +1,16 @@
+---
+layout: page
+---
+{{ content }}
+
+
+<script
+  type="application/javascript"
+  src="https://cdn.jsdelivr.net/npm/universalviewer@4.0.18/dist/umd/UV.js"
+></script>
+<script src="{{ site.baseurl }}/assets/datatables/datatables.min.js"></script>
+
+{%- include player.html player_name="aUV" manifest_name=page.a_manifest_name table_id="annotation-table-a" -%}
+{%- include player.html player_name="bUV" manifest_name=page.b_manifest_name table_id="annotation-table-b" -%}
+
+
