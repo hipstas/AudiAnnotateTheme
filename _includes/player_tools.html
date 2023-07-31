@@ -1,19 +1,19 @@
 <script>
  
-  function playRow(element) {
+  function {{ include.player_name }}_playRow(element) {
      var mySelectorTimestamp = element.find('td.timestamp').data('timestamp');
      var mySelectorEndTime = element.find('td.timestamp').data('endtime');
      var myTarget = element.find('td.timestamp').data('target');
      var myManifest = element.find('td.timestamp').data('manifest');
      if (myTarget) {
-       target = myTarget + '#t=' + mySelectorTimestamp;
+       var target = myTarget + '#t=' + mySelectorTimestamp;
        //if (mySelectorEndTime) {
        //  target = myTarget + '#t=' + mySelectorTimestamp + ',' + mySelectorEndTime;
        //}
-       console.log(target);
        buttonPressIteration = -1;
-
-       myUV.set({
+       
+       console.log('Setting {{ include.player_name }} to '+target);
+       {{ include.player_name }}.set({
          target: target,
           manifestUri: myManifest,
           manifest: myManifest,
@@ -22,25 +22,27 @@
           annotations: [],
           locales: [{ name: 'en-GB', label: 'English' }, { name: 'cy-GB', label: 'Welsh' }]
         });
+        console.log('Manifest of the player I touched was '+{{ include.player_name }}.options.data.manifest);
      }
    };
 
 
 
-  $('tr').on('click',function(){
-    playRow($(this));
+  $('#{{include.table_id}}').find('tr').on('click',function(){
+    console.log(`tr callback on {{include.table_id}} calling {{ include.player_name }}_playRow`);
+    {{ include.player_name }}_playRow($(this));
   });
 
-  $('#uv').on('click', function(){
+  $('#{{ include.player_name }}').on('click', function(){
     buttonPressIteration=-1;
   });
 
-  function setFirstRow() {
-    var firstRow = $($('#annotation-table').find("tr")[1]);
+  function {{ include.player_name }}_setFirstRow() {
+    var firstRow = $($('#{{include.table_id}}').find("tr")[1]);
     var myManifest = firstRow.find('td.timestamp').data('manifest');
-    console.log(`setFirstRow calling myUV.set with manifestUri: ${myManifest}`);
+    console.log(`setFirstRow calling {{ include.player_name }}.set with manifestUri: ${myManifest}`);
 
-     myUV.set({
+     {{ include.player_name }}.set({
         manifestUri: myManifest,
         manifest: myManifest,
         iiifManifestId: myManifest,
@@ -71,7 +73,7 @@
          console.log(`Setting UV to ${target}\n`);
 
 
-         myUV.set({
+         {{ include.player_name }}.set({
            target: target,
             manifestUri: myManifest,
             manifest: myManifest,
@@ -93,7 +95,7 @@
     console.log(`planning to pause at ${pausePoint}`)
     setTimeout((element) => {
       console.log(`pausing at ${pausePoint}`)
-      myUV.extension.centerPanel.player.pause();
+      {{ include.player_name }}.extension.centerPanel.player.pause();
     }, pausePoint);
    
 

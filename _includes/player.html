@@ -1,0 +1,171 @@
+<h3>{{ include.player_name }}</h3>
+<h5>{{ include.manifest_name }}</h5>
+<h4>{{site.data[include.manifest_name].manifest.id}}</h4>
+
+{%- assign format = site.data[include.manifest_name].manifest.items[0].items[0].items[0].body.type -%}
+{%- if site.data[include.manifest_name].manifest.requiredStatement -%}
+  {%- assign make_big = true -%}
+{%- else -%}
+  {%- assign make_big = false -%}
+{%- endif -%}
+
+
+
+{% if site.data[include.manifest_name].manifest.items[0].items[0].items[0].body.id == "" %}
+  The media file is not available
+
+{% else %}
+  <div id="{{ include.player_name }}" {%- if make_big==false and format == "Audio" or format == "Sound" -%} class="uv uv-audio sticky" {%- else -%} class="uv uv-video sticky" {%- endif -%}  ></div>
+{% endif %}
+
+  <script>
+    var {{ include.player_name }};
+
+    {{ include.player_name }} = UV.init('{{ include.player_name }}', {
+        manifestUri: '{{site.data[include.manifest_name].manifest.id}}',
+        manifest: '{{site.data[include.manifest_name].manifest.id}}',
+        root: '../../{{ site.baseurl }}/assets/uv/umd',
+        embedded: true
+    });
+
+    console.log(`instatntiation post UV.init`);
+
+
+      // override config using an inline json object
+      {{ include.player_name }}.on("configure", function ({ config, cb }) {
+        cb({
+            "options": {
+              "dropEnabled": true,
+              "footerPanelEnabled": false,
+              "headerPanelEnabled": false,
+              "leftPanelEnabled": false,
+              "limitLocales": false,
+              "overrideFullScreen": false,
+              "pagingEnabled": false,
+              "rightPanelEnabled": false
+             }
+        });
+      });
+      console.log(`instatntiation calling {{ include.player_name }}.configure with manifest={{site.data[include.manifest_name].manifest.id}}`);
+
+</script>
+
+
+
+{% assign annotation_page_array = "" | split: ',' %}
+
+{% for annotation_page_item in site.data.annotation_store %}
+  {% assign annotation_page_slug_raw = annotation_page_item[0] %}
+  {% assign annotation_page_slug_parts = annotation_page_slug_raw | split: include.manifest_name %}
+  {% if annotation_page_slug_parts.first == "" %}
+    {% assign annotation_page_array = annotation_page_array | push: annotation_page_item[1] %}
+  {% endif %}
+{% endfor %}
+
+
+{%- for annotation_page_raw in site.data[page.a_manifest_name]['canvas-1'] -%}
+  <!-- TODO move real_slug logic here? -->
+  {% assign annotation_page_array = annotation_page_array | push: annotation_page_raw[1] %}
+{% endfor %}
+
+
+<table id="{{ include.table_id }}"  class="table table-bordered table-dark">
+  <thead>
+    <tr>
+      <th style="width: 20%;">Time</th>
+      <th>Annotation</th>
+      <th>Layer</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for annotation_page in annotation_page_array -%}
+      {%- if annotation_page.label.first -%}
+        {% assign page_label = annotation_page.label.first[1] %}
+      {% else %}
+        {% assign page_label = annotation_page.label %}
+      {% endif %}
+
+      {%- if annotation_page.id contains site.github_username -%}
+        {% assign portions = annotation_page.id | split: '/' %}
+        {% assign real_slug = portions[7] | replace: ".json", "" %}
+      {%- else -%}
+        {% assign real_slug = annotation_page.id | replace: ":", "_"| replace: ".", "_" | replace: ",", "_"| replace: "/", "_"| replace: "-", "_" %}
+      {%- endif -%}
+
+      {%- for annotation in annotation_page.items -%}
+        <tr>
+          {% if annotation.target.selector %}
+            {% assign timestamp_array = annotation.target.selector.t | split: ',' %}
+          {% else %}
+            {% assign target_array = annotation.target | split: 't=' %}
+            {% assign timestamp_array = target_array[1] | split: ',' %}
+          {% endif %}
+          {% if annotation.target.source %}
+            {% assign target_source = annotation.target.source %}
+          {% else %}
+            {% assign target_source = annotation.target %}
+          {% endif %}
+          <td class="timestamp" 
+              data-timestamp="{{timestamp_array[0]}}"  
+              data-sort="{{timestamp_array[0]}}" 
+              data-target="{{target_source}}"
+              {% if timestamp_array[1] %}
+                data-endtime="{{timestamp_array[1]}}"  
+              {% endif %}
+              data-manifest="{{site.data[include.manifest_name].manifest.id}}"
+
+          >
+           {% assign seconds = timestamp_array[0] | times: 1 %}
+            {% if seconds >= 3600 %}
+              {{ seconds | divided_by: 3600 | floor }}:{{seconds | divided_by: 60 | modulo: 60 | floor | prepend: '00' | slice: -2, 2 }}:{{seconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+            {% else %}
+              {{seconds | divided_by: 60 | modulo: 60 | floor }}:{{seconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+            {% endif %}
+            {% if timestamp_array[1] %}
+              {% assign endseconds = timestamp_array[1] | times: 1 %}
+              - 
+                {% if endseconds >= 3600 %}
+                  {{ endseconds | divided_by: 3600 | floor }}:{{endseconds | divided_by: 60 | modulo: 60 | floor | prepend: '00' | slice: -2, 2 }}:{{endseconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+                {% else %}
+                  {{endseconds | divided_by: 60 | modulo: 60 | floor }}:{{endseconds | modulo: 60 | ceil | prepend: '00' | slice: -2, 2}} 
+                {% endif %}
+            {% endif %}
+          </td>
+          <td>
+            {%- if annotation.body['type'] -%}
+              {% assign body = annotation.body.value %}
+            {% else %}
+              {%- for raw_body in annotation.body -%}
+                {% if raw_body.purpose contains "tagging" %}
+                {% else %}
+                  {% assign body = raw_body.value %}                
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            {{body | newline_to_br}}
+          </td>
+          <td>{{page_label}}</td>
+        </tr>
+      {%- endfor -%}
+    {%- endfor -%}
+  </tbody>
+</table>
+
+<div>
+<p></p>
+<p>
+  <a href="{{ site.data[include.manifest_name].manifest.homepage[0].id }}">{{ site.data[include.manifest_name].manifest.homepage[0].label.en[0] }}</a>
+   at 
+  <a href="{{ site.data[include.manifest_name].manifest.provider[0].id }}">{{ site.data[include.manifest_name].manifest.provider[0].label.en[0] }}</a>. 
+</p>
+IIIF manifest: <a href="{{site.data[include.manifest_name].manifest.id}}">{{site.data[include.manifest_name].manifest.id}}</a>
+</div>
+
+{%- include player_tools.html player_name=include.player_name table_id=include.table_id -%}
+
+<script>
+  $(document).ready( function() {
+      $('#{{ include.table_id }}').DataTable({ paging: false });
+  } );
+ </script>
+
