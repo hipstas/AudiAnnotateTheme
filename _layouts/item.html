@@ -165,7 +165,7 @@ layout: page
 IIIF manifest: <a href="{{site.data[page.manifest_name].manifest.id}}">{{site.data[page.manifest_name].manifest.id}}</a>
 </div>
 
-{%- include player_tools.html -%}
+{%- include player_tools.html player_name="myUV" table_id="annotation-table" -%}
 
 <script>
   $(document).ready( function() {
