@@ -140,6 +140,13 @@ x 1) Separate load logic from display logic in old annotation code
       {% endif %}
 
         {%- for annotation in annotation_page.items -%}
+
+          {%- if annotation.target.source.first -%}
+            {% assign target_source = annotation.target.source.id %}
+          {% else %}
+            {% assign target_source = annotation.target.source %}
+          {% endif %}
+
           {%- if annotation.body['type'] -%}
           {% else %}
             {% assign body = "" %}
@@ -148,7 +155,7 @@ x 1) Separate load logic from display logic in old annotation code
                 {%- for raw_body_again in annotation.body -%}
                   {% if raw_body_again['purpose'] != 'tagging' %}
                     <tr>
-                      {%- assign target_portions =  annotation['target']['source'] | split: '/' -%}
+                      {%- assign target_portions =  target_source | split: '/' -%}
                       {%- assign target_slug =  target_portions[4] -%}
                       <td data-sort="{{manifest_index}}">
                         <a href="{{target_slug | relative_url}}">{{ manifest_label }}</a>
@@ -159,11 +166,11 @@ x 1) Separate load logic from display logic in old annotation code
                         {% assign target_array = annotation.target | split: 't=' %}
                         {% assign timestamp_array = target_array[1] | split: ',' %}
                       {% endif %}
-                      {% assign target_manifest = annotation['target']['source'] | replace: 'canvas-1/canvas', 'manifest.json' %}
+                      {% assign target_manifest = target_source | replace: 'canvas-1/canvas', 'manifest.json' %}
                       <td class="timestamp" 
                           data-timestamp="{{timestamp_array[0]}}"  
                           data-sort="{{timestamp_array[0]}}" 
-                          data-target="{{annotation.target.source}}"
+                          data-target="{{target_source}}"
                           {% if timestamp_array[1] %}
                             data-endtime="{{timestamp_array[1]}}"  
                           {% endif %}

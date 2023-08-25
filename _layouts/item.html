@@ -105,7 +105,11 @@ layout: page
             {% assign timestamp_array = target_array[1] | split: ',' %}
           {% endif %}
           {% if annotation.target.source %}
-            {% assign target_source = annotation.target.source %}
+            {%- if annotation.target.source.first -%}
+              {% assign target_source = annotation.target.source.id %}
+            {% else %}
+              {% assign target_source = annotation.target.source %}
+            {% endif %}
           {% else %}
             {% assign target_source = annotation.target %}
           {% endif %}
