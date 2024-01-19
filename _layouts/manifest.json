@@ -1,1 +1,15 @@
-{{ site.data[page.manifest_name].manifest | jsonify }}
+{%- assign manifest = site.data[page.manifest_name].manifest -%}
+{ "@context":"http://iiif.io/api/presentation/3/context.json",  "structures": [
+      {
+        "id": "{{site.data[page.manifest_name].manifest.id}}/range/r0",
+        "type": "Range",
+        "label": { "en": "Default"},
+        "items": [
+          {
+            "id": "{{site.data[page.manifest_name].manifest.id}}/canvas-1/canvas",
+            "type": "Canvas"
+          }
+        ]
+      }
+    ],
+{{ manifest | jsonify | replace: '{"@context":"http://iiif.io/api/presentation/3/context.json",', '' }}
