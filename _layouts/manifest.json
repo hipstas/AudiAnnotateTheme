@@ -3,7 +3,7 @@
       {
         "id": "{{site.data[page.manifest_name].manifest.id}}/range/r0",
         "type": "Range",
-        "label": { "en": "Default"},
+        "label": { "en": ["Default"]},
         "items": [
           {
             "id": "{{site.data[page.manifest_name].manifest.id}}/canvas-1/canvas",
