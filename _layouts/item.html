@@ -17,10 +17,19 @@ layout: page
 {% else %}
   <div id="uv" {%- if make_big==false and format == "Audio" or format == "Sound" -%} class="uv uv-audio sticky" {%- else -%} class="uv uv-video sticky" {%- endif -%}  ></div>
 {% endif %}
-  <script
-    type="application/javascript"
-    src="{{ site.baseurl }}/assets/js/uv/umd/UV.js"
-  ></script>
+  {%- if format == "Audio" or format == "Sound" -%}
+    <script
+      type="application/javascript"
+      src="{{ site.baseurl }}/assets/js/uv/umd/UV.js"
+    ></script>
+  {%- else -%}
+    <script
+      type="application/javascript"
+      src="{{ site.baseurl }}/assets/js/uv/umd/UV.js"
+    ></script>
+  {%- endif -%}
+
+
   <script src="{{ site.baseurl }}/assets/datatables/datatables.min.js"></script>
 
   <script>
