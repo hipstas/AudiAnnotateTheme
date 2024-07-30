@@ -9,7 +9,7 @@ layout: page
 
 
 <div class="aviary-wrapper">
-<iframe src="https://iiif.aviaryplatform.com/player?manifest={{site.data[page.manifest_name].manifest.id}}&tab=Annotations" height="100%" {%- if format == "Audio" or format == "Sound" -%} width="1250px"  scrolling="yes" {%- else -%} width="100%"  scrolling="no" {%- endif -%} name="iframe"” title="This is my video" style="border:none"></iframe>
+<iframe src="https://iiif.aviaryplatform.com/player?manifest={{site.data[page.manifest_name].manifest.id}}&tab=Annotations" height="100%" {%- if format == "Audio" or format == "Sound" -%} width="1250px"  scrolling="yes" {%- else -%} width="100%"  scrolling="yes" {%- endif -%} name="iframe"” title="This is my video" style="border:none"></iframe>
 </div>
 
 IIIF manifest: <a href="{{site.data[page.manifest_name].manifest.id}}">{{site.data[page.manifest_name].manifest.id}}</a><br/>
